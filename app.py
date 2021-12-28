@@ -44,9 +44,11 @@ if choice == options[2]:
         st.write('Process sound file(Speech Data) and generate MFCC and STFT')
         soundfiles= os.listdir('sounds')
         file = st.selectbox('Select a sound file',soundfiles)
+        
         process_audio = st.form_submit_button('Process')
     if process_audio:
         if file is not None:
+            st.audio(f'sounds/{file}')
             audio_file = 'sounds/'+file
             st.info(f"processing {audio_file}")
             y, sr = librosa.load(audio_file)
