@@ -6,6 +6,9 @@ from code import record,save
 import matplotlib.pyplot as plt
 import numpy as np
 import librosa, librosa.display
+from code import *
+
+from utils.splitTrainDev import predict
 
 st.set_page_config(page_title="Audio", layout="wide")
 
@@ -54,7 +57,7 @@ if choice == options[2]:
             y, sr = librosa.load(audio_file)
             
             fig,ax = plt.subplots(figsize=(12, 3))
-            librosa.display.waveplot(y, sr=sr)
+            librosa.display.waveshow(y, sr=sr)
             ax.set_title('Waveform')
             st.pyplot(fig)
             c1,c2 = st.columns(2)
@@ -70,7 +73,12 @@ if choice == options[2]:
             stft_file = 'datasets/'+file.split('.')[0]+"_stft.png"
             fig3.savefig(stft_file)
             c2.pyplot(fig3)
-            st.success(f"stft saved to {stft_file}")            
+            st.success(f"stft saved to {stft_file}") 
+            prediction = predict('dataset',stft_file)  
+            if prediction == 0:
+                st.markdown(f"# Voice shows sign of depression 😖 in analysis")
+            else:
+                st.markdown(f"# Voice does not show sign of depression 😀 in analyis")   
 
         else:
             st.error("please select a file")

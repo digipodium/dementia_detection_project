@@ -1,6 +1,8 @@
 import pyaudio
 import io
 import wave
+from utils.splitTrainDev import *
+from utils.splitTrainDev import main
 
 def record(RECORD_SECONDS=5, WAVE_OUTPUT_FILENAME="output.wav", CHUNK=1024, FORMAT=pyaudio.paInt16, CHANNELS=2, RATE=44100, frames=[]):
     p = pyaudio.PyAudio()
@@ -31,6 +33,14 @@ def play(path, CHUNK = 1024):
     stream.stop_stream()
     stream.close()
     p.terminate()
+
+def load_model(path="models"):
+    path = r'model/dementia.cpkt.data-00000-of-00001'
+    return path
+
+def predict_audio(path):
+    model = load_model()
+    return predict(model,path)
 
 def save(bytes, filepath="audios/uploads/upload.wav"):
 
