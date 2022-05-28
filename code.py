@@ -35,7 +35,8 @@ def play(path, CHUNK = 1024):
     p.terminate()
 
 def load_model(path="models"):
-    path = r'model/dementia.cpkt.data-00000-of-00001'
+    path = r'models/cnn_svm.h5'
+    
     return path
 
 def predict_audio(path):

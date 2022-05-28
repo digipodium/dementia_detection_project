@@ -9,6 +9,45 @@ import librosa, librosa.display
 from code import *
 
 from utils.splitTrainDev import predict
+#preprocessing images
+import tensorflow as tf
+from tensorflow.keras import layers, models,preprocessing,regularizers,callbacks
+from matplotlib import pyplot as plt
+
+def setup_empty_model():
+    # model
+    model = models.Sequential()
+    model.add(layers.Conv2D(32, (5,5), activation='relu', input_shape=(512, 512, 3)))
+    model.add(layers.MaxPooling2D((4, 4), strides=4))
+    model.add(layers.Conv2D(32, (3, 3), activation='relu',kernel_regularizer=regularizers.l2(0.01)))
+    model.add(layers.MaxPooling2D((1, 3), strides=(1,3)))
+    model.add(layers.Flatten())
+    model.add(layers.Dense(128, activation='linear',kernel_regularizer=regularizers.l2(0.01)))
+    model.add(layers.Dropout(0.6))
+    model.add(layers.Dense(256, activation='relu',kernel_regularizer=regularizers.l2(0.0001)))
+    model.add(layers.Dropout(0.8))
+    model.add(layers.experimental.RandomFourierFeatures(output_dim=10))
+    model.add(layers.Dense(1, activation='sigmoid'))
+    model.compile(optimizer=tf.keras.optimizers.SGD(),
+                loss=tf.keras.losses.BinaryCrossentropy(),
+                metrics=['accuracy',
+                        tf.keras.metrics.TrueNegatives(),
+                        tf.keras.metrics.TruePositives(),
+                        tf.keras.metrics.FalseNegatives(),
+                        tf.keras.metrics.FalsePositives()])
+    return model
+
+def setup_model():
+    model = setup_empty_model()
+    model.load_weights('models/cnn_svm_weights.h5')
+    return model
+
+def predict(img):
+    model = setup_model()
+    img = preprocessing.image.load_img(img, target_size=(512, 512))
+    img = preprocessing.image.img_to_array(img)
+    xinput = np.expand_dims(img, axis=0)
+    return model.predict(xinput)
 
 st.set_page_config(page_title="Audio", layout="wide")
 
@@ -74,7 +113,7 @@ if choice == options[2]:
             fig3.savefig(stft_file)
             c2.pyplot(fig3)
             st.success(f"stft saved to {stft_file}") 
-            prediction = predict('dataset',stft_file)  
+            prediction = predict(stft_file)  
             if prediction == 0:
                 st.markdown(f"# Voice shows sign of depression 😖 in analysis")
             else:
